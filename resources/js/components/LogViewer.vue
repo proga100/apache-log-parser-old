@@ -24,37 +24,37 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th @click="sort('ip_address')" class="sortable col-ip">
+            <th @click="sort('ip_address')" class="sortable col-ip" :class="getSortClass('ip_address')">
               IP Address
-              <span v-if="sortField === 'ip_address'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+              <span class="sort-icon">{{ getSortIcon('ip_address') }}</span>
             </th>
-            <th @click="sort('request_method')" class="sortable col-method">
+            <th @click="sort('request_method')" class="sortable col-method" :class="getSortClass('request_method')">
               Method
-              <span v-if="sortField === 'request_method'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+              <span class="sort-icon">{{ getSortIcon('request_method') }}</span>
             </th>
-            <th @click="sort('request_path')" class="sortable col-path">
+            <th @click="sort('request_path')" class="sortable col-path" :class="getSortClass('request_path')">
               Path
-              <span v-if="sortField === 'request_path'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+              <span class="sort-icon">{{ getSortIcon('request_path') }}</span>
             </th>
-            <th @click="sort('status_code')" class="sortable col-status">
+            <th @click="sort('status_code')" class="sortable col-status" :class="getSortClass('status_code')">
               Status
-              <span v-if="sortField === 'status_code'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+              <span class="sort-icon">{{ getSortIcon('status_code') }}</span>
             </th>
-            <th @click="sort('request_time')" class="sortable col-time">
+            <th @click="sort('request_time')" class="sortable col-time" :class="getSortClass('request_time')">
               Time
-              <span v-if="sortField === 'request_time'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+              <span class="sort-icon">{{ getSortIcon('request_time') }}</span>
             </th>
             <th class="col-agent">User Agent</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="log in logs.data" :key="log.id">
-            <td class="col-ip">{{ log.ip_address }}</td>
-            <td class="col-method">{{ log.request_method }}</td>
-            <td class="col-path">{{ log.request_path }}</td>
-            <td :class="['col-status', getStatusClass(log.status_code)]">{{ log.status_code }}</td>
-            <td class="col-time">{{ formatDate(log.request_time) }}</td>
-            <td class="col-agent">{{ log.user_agent }}</td>
+            <td class="col-ip" :title="log.ip_address">{{ log.ip_address }}</td>
+            <td class="col-method" :title="log.request_method">{{ log.request_method }}</td>
+            <td class="col-path" :title="log.request_path">{{ log.request_path }}</td>
+            <td :class="['col-status', getStatusClass(log.status_code)]" :title="log.status_code">{{ log.status_code }}</td>
+            <td class="col-time" :title="formatDate(log.request_time)">{{ formatDate(log.request_time) }}</td>
+            <td class="col-agent" :title="log.user_agent">{{ log.user_agent }}</td>
           </tr>
         </tbody>
       </table>
@@ -132,6 +132,17 @@ export default {
         this.sortDirection = 'asc';
       }
       this.fetchLogs();
+    },
+    getSortClass(field) {
+      return {
+        'sorted': this.sortField === field,
+        'sorted-asc': this.sortField === field && this.sortDirection === 'asc',
+        'sorted-desc': this.sortField === field && this.sortDirection === 'desc'
+      }
+    },
+    getSortIcon(field) {
+      if (this.sortField !== field) return '↕';
+      return this.sortDirection === 'asc' ? '↑' : '↓';
     },
     changePage(page) {
       if (page >= 1 && page <= this.logs.last_page) {
@@ -229,10 +240,41 @@ th, td {
 .sortable {
   cursor: pointer;
   user-select: none;
+  position: relative;
+  padding-right: 25px !important;
+}
+
+.sort-icon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.3;
+  transition: opacity 0.2s;
+}
+
+.sorted .sort-icon {
+  opacity: 1;
+}
+
+.sorted {
+  background-color: #f8f9fa;
+}
+
+.sorted-asc {
+  background-color: #e9ecef;
+}
+
+.sorted-desc {
+  background-color: #e9ecef;
 }
 
 .sortable:hover {
-  background-color: #f8f9fa;
+  background-color: #e9ecef;
+}
+
+.sortable:hover .sort-icon {
+  opacity: 1;
 }
 
 /* Add tooltip for truncated content */
