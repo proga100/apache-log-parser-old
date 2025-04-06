@@ -11,6 +11,7 @@ class ApacheLogController extends Controller
 {
     private ApacheLogParser $logParser;
 
+    
     /**
      * @param ApacheLogParser $logParser
      */
@@ -29,27 +30,43 @@ class ApacheLogController extends Controller
     {
         $query = ApacheLog::query();
 
-        // Фильтрация
-        if ($request->has('ip_address')) {
-            $query->where('ip_address', 'like', '%' . $request->ip_address . '%');
-        }
-        if ($request->has('status_code')) {
-            $query->where('status_code', $request->status_code);
-        }
-        if ($request->has('date_from')) {
-            $query->where('request_time', '>=', $request->date_from);
-        }
-        if ($request->has('date_to')) {
-            $query->where('request_time', '<=', $request->date_to);
+        // IP address filter
+        if ($request->has('ip_address') && $request->ip_address) {
+            $query->where('ip_address', 'LIKE', '%' . $request->ip_address . '%');
         }
 
-        // Сортировка
+        // Status code filter
+        if ($request->has('status_code') && $request->status_code) {
+            $query->where('status_code', '=', $request->status_code);
+        }
+
+        // Date range filter
+        if ($request->has('date_from') && $request->date_from) {
+            $query->whereDate('request_time', '>=', $request->date_from);
+        }
+
+        if ($request->has('date_to') && $request->date_to) {
+            $query->whereDate('request_time', '<=', $request->date_to);
+        }
+
+        // Sorting
         $sortField = $request->get('sort_field', 'request_time');
         $sortDirection = $request->get('sort_direction', 'desc');
-        $query->orderBy($sortField, $sortDirection);
+        
+        // Validate sort field to prevent SQL injection
+        $allowedSortFields = ['ip_address', 'request_time', 'request_method', 'status_code', 'response_size'];
+        if (!in_array($sortField, $allowedSortFields)) {
+            $sortField = 'request_time';
+        }
+        
+        $query->orderBy($sortField, $sortDirection === 'asc' ? 'asc' : 'desc');
 
-        // Пагинация
-        $perPage = $request->get('per_page', 15);
+        // Pagination
+        $perPage = (int) $request->get('per_page', 15);
+        if ($perPage < 1 || $perPage > 100) {
+            $perPage = 15;
+        }
+
         return response()->json($query->paginate($perPage));
     }
 

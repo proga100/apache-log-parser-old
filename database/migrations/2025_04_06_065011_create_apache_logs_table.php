@@ -12,11 +12,11 @@ return new class extends Migration
             $table->id();
             $table->string('ip_address');
             $table->string('request_method');
-            $table->string('request_path');
+            $table->text('request_path');
             $table->integer('status_code');
             $table->integer('response_size')->nullable();
-            $table->string('user_agent')->nullable();
-            $table->string('referer')->nullable();
+            $table->text('user_agent')->nullable();
+            $table->text('referer')->nullable();
             $table->timestamp('request_time');
             $table->timestamps();
             
