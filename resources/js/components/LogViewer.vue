@@ -60,20 +60,32 @@
       </table>
     </div>
 
-    <div class="pagination mt-4">
-      <nav>
-        <ul class="pagination">
-          <li class="page-item" :class="{ disabled: !logs.prev_page_url }">
-            <a class="page-link" href="#" @click.prevent="changePage(logs.current_page - 1)">Previous</a>
-          </li>
-          <li v-for="page in logs.last_page" :key="page" class="page-item" :class="{ active: page === logs.current_page }">
-            <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
-          </li>
-          <li class="page-item" :class="{ disabled: !logs.next_page_url }">
-            <a class="page-link" href="#" @click.prevent="changePage(logs.current_page + 1)">Next</a>
-          </li>
-        </ul>
-      </nav>
+    <div class="pagination-container mt-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="per-page-selector">
+          <label class="me-2">Строк в таблице:</label>
+          <select v-model="perPage" class="form-select form-select-sm" @change="changePerPage">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+
+        <nav>
+          <ul class="pagination mb-0">
+            <li class="page-item" :class="{ disabled: !logs.prev_page_url }">
+              <a class="page-link" href="#" @click.prevent="changePage(logs.current_page - 1)">Previous</a>
+            </li>
+            <li v-for="page in logs.last_page" :key="page" class="page-item" :class="{ active: page === logs.current_page }">
+              <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+            </li>
+            <li class="page-item" :class="{ disabled: !logs.next_page_url }">
+              <a class="page-link" href="#" @click.prevent="changePage(logs.current_page + 1)">Next</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
 
     <div class="upload-section mt-4">
@@ -106,7 +118,8 @@ export default {
       },
       sortField: 'request_time',
       sortDirection: 'desc',
-      selectedFile: null
+      selectedFile: null,
+      perPage: 25 // Default value
     }
   },
   methods: {
@@ -116,6 +129,7 @@ export default {
           page: this.logs.current_page,
           sort_field: this.sortField,
           sort_direction: this.sortDirection,
+          per_page: this.perPage,
           ...this.filters
         };
         const response = await axios.get('/api/logs', { params });
@@ -183,6 +197,10 @@ export default {
       } catch (error) {
         console.error('Error uploading file:', error);
       }
+    },
+    changePerPage() {
+      this.logs.current_page = 1; // Reset to first page when changing items per page
+      this.fetchLogs();
     }
   },
   mounted() {
@@ -316,5 +334,24 @@ td:hover::after {
   table {
     min-width: 900px;
   }
+}
+
+.pagination-container {
+  margin-bottom: 1rem;
+}
+
+.per-page-selector {
+  display: flex;
+  align-items: center;
+}
+
+.per-page-selector label {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.per-page-selector select {
+  width: auto;
+  min-width: 80px;
 }
 </style> 
