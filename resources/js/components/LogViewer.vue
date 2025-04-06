@@ -20,41 +20,41 @@
       </div>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-container">
       <table class="table table-striped">
         <thead>
           <tr>
-            <th @click="sort('ip_address')" class="sortable">
+            <th @click="sort('ip_address')" class="sortable col-ip">
               IP Address
               <span v-if="sortField === 'ip_address'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
             </th>
-            <th @click="sort('request_method')" class="sortable">
+            <th @click="sort('request_method')" class="sortable col-method">
               Method
               <span v-if="sortField === 'request_method'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
             </th>
-            <th @click="sort('request_path')" class="sortable">
+            <th @click="sort('request_path')" class="sortable col-path">
               Path
               <span v-if="sortField === 'request_path'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
             </th>
-            <th @click="sort('status_code')" class="sortable">
+            <th @click="sort('status_code')" class="sortable col-status">
               Status
               <span v-if="sortField === 'status_code'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
             </th>
-            <th @click="sort('request_time')" class="sortable">
+            <th @click="sort('request_time')" class="sortable col-time">
               Time
               <span v-if="sortField === 'request_time'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
             </th>
-            <th>User Agent</th>
+            <th class="col-agent">User Agent</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="log in logs.data" :key="log.id">
-            <td>{{ log.ip_address }}</td>
-            <td>{{ log.request_method }}</td>
-            <td>{{ log.request_path }}</td>
-            <td :class="getStatusClass(log.status_code)">{{ log.status_code }}</td>
-            <td>{{ formatDate(log.request_time) }}</td>
-            <td>{{ log.user_agent }}</td>
+            <td class="col-ip">{{ log.ip_address }}</td>
+            <td class="col-method">{{ log.request_method }}</td>
+            <td class="col-path">{{ log.request_path }}</td>
+            <td :class="['col-status', getStatusClass(log.status_code)]">{{ log.status_code }}</td>
+            <td class="col-time">{{ formatDate(log.request_time) }}</td>
+            <td class="col-agent">{{ log.user_agent }}</td>
           </tr>
         </tbody>
       </table>
@@ -181,10 +181,98 @@ export default {
 </script>
 
 <style scoped>
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+table {
+  width: 100%;
+  table-layout: fixed;
+  white-space: nowrap;
+}
+
+th, td {
+  padding: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.col-ip {
+  width: 120px;
+}
+
+.col-method {
+  width: 80px;
+}
+
+.col-path {
+  width: 30%;
+  max-width: 400px;
+}
+
+.col-status {
+  width: 80px;
+  text-align: center;
+}
+
+.col-time {
+  width: 160px;
+}
+
+.col-agent {
+  width: calc(100% - 840px);
+  min-width: 200px;
+}
+
 .sortable {
   cursor: pointer;
+  user-select: none;
 }
+
 .sortable:hover {
   background-color: #f8f9fa;
+}
+
+/* Add tooltip for truncated content */
+td {
+  position: relative;
+}
+
+td:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  z-index: 1;
+  background: #333;
+  color: white;
+  padding: 5px;
+  border-radius: 3px;
+  white-space: normal;
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .col-path {
+    width: 25%;
+  }
+  
+  .col-agent {
+    width: calc(100% - 740px);
+  }
+}
+
+@media (max-width: 768px) {
+  .table-container {
+    overflow-x: scroll;
+  }
+  
+  table {
+    min-width: 900px;
+  }
 }
 </style> 
