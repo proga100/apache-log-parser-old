@@ -48,10 +48,11 @@ php artisan key:generate
 
 6. Настройте базу данных в файле `.env`:
 ```
+Создайте базу данных с названием apache_log
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=apache_logs
+DB_DATABASE=apache_log
 DB_USERNAME=ваш_пользователь
 DB_PASSWORD=ваш_пароль
 ```
