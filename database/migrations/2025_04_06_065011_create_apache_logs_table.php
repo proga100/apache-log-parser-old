@@ -6,22 +6,29 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('apache_logs', function (Blueprint $table) {
             $table->id();
+            $table->string('ip_address');
+            $table->string('request_method');
+            $table->string('request_path');
+            $table->integer('status_code');
+            $table->integer('response_size')->nullable();
+            $table->string('user_agent')->nullable();
+            $table->string('referer')->nullable();
+            $table->timestamp('request_time');
             $table->timestamps();
+            
+            // Индексы для оптимизации поиска
+            $table->index('ip_address');
+            $table->index('status_code');
+            $table->index('request_time');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('apache_logs');
     }
-};
+}; 
