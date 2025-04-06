@@ -22,8 +22,8 @@
 
 1. Клонируйте репозиторий:
 ```bash
-git clone <repository-url>
-cd apache-log-parser
+git clone https://github.com/proga100/apache-log-parser-old
+cd apache-log-parser-old
 ```
 
 2. Установите PHP зависимости:
